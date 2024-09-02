@@ -271,6 +271,36 @@ server.post('/posts/:id/comments', (req, res) => {
     res.status(201).json(newComment);
 });
 
+
+// Ruta personalizada para obtener el perfil de un usuario con URLs de los posts
+server.get('/users/:id', (req, res) => {
+    const { id } = req.params;
+
+    // Obtener los detalles del usuario
+    const user = router.db.get('users').find({ id: parseInt(id) }).value();
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    // Obtener la URL base desde las variables de entorno (en Vercel)
+    const baseUrl = process.env.VERCEL_URL || 'http://localhost:3000'; // Usar localhost para desarrollo local
+
+    // Obtener los posts asociados al usuario
+    const posts = router.db.get('posts').filter({ userId: parseInt(id) }).value();
+
+    // Crear una lista de posts con solo el id y la URL del endpoint
+    const postDetails = posts.map(post => ({
+        id: post.id,
+        url: `${baseUrl}/posts/${post.id}` // Construir URL completa
+    }));
+
+    // Enviar la respuesta con el usuario y los detalles de los posts
+    res.status(200).json({
+        ...user,
+        posts: postDetails
+    });
+});
+
+
+
 // Usar los middlewares y enrutadores
 server.use(middlewares);
 server.use(router);
