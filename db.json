@@ -1,0 +1,147 @@
+{
+    "roles": [
+        {
+            "id": 1,
+            "name": "Usuario",
+            "permissions": [
+                "read",
+                "write",
+                "comment",
+                "like"
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Moderador",
+            "permissions": [
+                "read",
+                "write",
+                "comment",
+                "like",
+                "delete_comment",
+                "ban_user"
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Administrador",
+            "permissions": [
+                "read",
+                "write",
+                "comment",
+                "like",
+                "delete_comment",
+                "ban_user",
+                "delete_post",
+                "manage_roles"
+            ]
+        }
+    ],
+    "users": [
+        {
+            "id": 1,
+            "name": "Coovas Admin",
+            "email": "john@example.com",
+            "username": "admin",
+            "password": "admin12345",
+            "profilePicture": "url_to_profile_picture",
+            "bio": "Breve biografía del usuario",
+            "location": "Ubicación del usuario",
+            "website": "url_to_website",
+            "birthdate": "2000-01-01",
+            "userRole": 3,
+            "followers": [
+                2,
+                3
+            ],
+            "following": [
+                2,
+                3
+            ],
+            "posts": [
+                1,
+                2
+            ],
+            "likes": 5,
+            "tags": [
+                1,
+                2
+            ]
+        }
+    ],
+    "posts": [
+        {
+            "id": 1,
+            "userId": 1,
+            "content": "Contenido de la publicación",
+            "mediaType": 1,
+            "mediaUrl": "url_to_media",
+            "likes": [
+                2,
+                3
+            ],
+            "comments": [
+                1,
+                2
+            ],
+            "tags": [
+                1,
+                3
+            ]
+        }
+    ],
+    "mediaTypes": [
+        {
+            "id": 1,
+            "type": "photo"
+        },
+        {
+            "id": 2,
+            "type": "video"
+        },
+        {
+            "id": 3,
+            "type": "reel"
+        },
+        {
+            "id": 4,
+            "type": "story"
+        }
+    ],
+    "followers": [
+        {
+            "id": 1,
+            "followerId": 2,
+            "followedId": 1
+        }
+    ],
+    "comments": [
+        {
+            "id": 1,
+            "postId": 1,
+            "userId": 2,
+            "content": "¡Gran publicación!",
+            "timestamp": "2024-09-02T12:34:56Z",
+            "likes": [
+                2,
+                3
+            ]
+        }
+    ],
+    "messages": [
+        {
+            "id": 1,
+            "senderId": 1,
+            "receiverId": 2,
+            "content": "¡Oye, mira esto!",
+            "timestamp": "2024-09-02T12:34:56Z"
+        }
+    ],
+    "tags": [
+        {
+            "id": 1,
+            "postId": 1,
+            "taggedUserId": 2
+        }
+    ]
+}
