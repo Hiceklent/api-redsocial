@@ -45,6 +45,7 @@
             "username": "admin",
             "password": "admin12345",
             "profilePicture": "url_to_profile_picture",
+            "bannerPicture": "url_to_banner_picture",
             "bio": "Breve biografía del usuario",
             "location": "Ubicación del usuario",
             "website": "url_to_website",
