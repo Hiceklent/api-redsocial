@@ -17,8 +17,29 @@ cloudinary.config({
     url: process.env.CLOUDINARY_URL
 });
 
-// Configuración para la carga de archivos
-const upload = multer({ dest: 'uploads/' });
+
+
+
+
+// Configuración de Multer para que no use almacenamiento local
+const storage = multer.memoryStorage(); // Usar memoria en lugar de disco
+const upload = multer({ storage });
+
+
+const handleImageUpload = async (buffer, width, height) => {
+    const imageBuffer = await sharp(buffer)
+        .resize({ width, height, fit: 'cover' })
+        .toBuffer();
+
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+        }).end(imageBuffer);
+    });
+};
+
+
 
 // Reescritura de URL para las rutas de la API
 server.use(jsonServer.rewriter({
@@ -83,18 +104,6 @@ const authenticateUser = (req, res, next) => {
     }
 };
 
-// Función para manejar la carga y procesamiento de imágenes
-const handleImageUpload = async (filePath, width, height) => {
-    const buffer = await sharp(filePath)
-        .resize({ width, height, fit: 'cover' })
-        .toBuffer();
-    return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-            if (error) return reject(error);
-            resolve(result.secure_url);
-        }).end(buffer);
-    });
-};
 
 // Ruta para actualizar la imagen de perfil
 server.post('/users/:id/updateProfilePicture', upload.single('profilePicture'), async (req, res) => {
@@ -104,8 +113,7 @@ server.post('/users/:id/updateProfilePicture', upload.single('profilePicture'), 
     if (!file) return res.status(400).json({ message: 'Se requiere un archivo para actualizar la imagen de perfil' });
 
     try {
-        const profilePictureUrl = await handleImageUpload(file.path, 200, 200);
-        fs.unlink(file.path, () => { });
+        const profilePictureUrl = await handleImageUpload(file.buffer, 200, 200);
 
         const user = router.db.get('users').find({ id: parseInt(id) }).value();
         if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -126,8 +134,7 @@ server.post('/users/:id/updateBannerPicture', upload.single('bannerPicture'), as
     if (!file) return res.status(400).json({ message: 'Se requiere un archivo para actualizar la imagen de banner' });
 
     try {
-        const bannerPictureUrl = await handleImageUpload(file.path, 1200, 400);
-        fs.unlink(file.path, () => { });
+        const bannerPictureUrl = await handleImageUpload(file.buffer, 1200, 400);
 
         const user = router.db.get('users').find({ id: parseInt(id) }).value();
         if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -139,7 +146,6 @@ server.post('/users/:id/updateBannerPicture', upload.single('bannerPicture'), as
         res.status(500).json({ message: 'Error al procesar la imagen' });
     }
 });
-
 // Ruta para crear un nuevo usuario
 server.post('/users', (req, res) => {
     const { username, email, password } = req.body;
